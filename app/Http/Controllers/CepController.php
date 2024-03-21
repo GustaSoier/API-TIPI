@@ -14,7 +14,7 @@ class CepController extends Controller
      */
     public function index()
     {
-        //
+        return view('cep');
     }
 
     /**
