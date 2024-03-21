@@ -14,7 +14,11 @@ class AlunoController extends Controller
      */
     public function index()
     {
-        //
+        // return 'Cheguei Aqui - INDEX';
+
+        $aluno = Aluno::all();
+
+        return $aluno;
     }
 
     /**
@@ -35,7 +39,14 @@ class AlunoController extends Controller
      */
     public function store(Request $request)
     {
-        return 'Cheguei Aqui - STORE';
+        // return ['Cheguei Aqui' => 'STORE']; formato JSON
+        // return 'Cheguei Aqui - STORE'; formato HTML
+
+        // dd($request->all());
+
+        $aluno = Aluno::create($request->all());
+
+        return $aluno;
     }
 
     /**
@@ -46,7 +57,9 @@ class AlunoController extends Controller
      */
     public function show(Aluno $aluno)
     {
-        //
+        // return 'Cheguei Aqui - SHOW';
+
+        return $aluno;
     }
 
     /**
@@ -69,7 +82,14 @@ class AlunoController extends Controller
      */
     public function update(Request $request, Aluno $aluno)
     {
-        //
+        // return 'Cheguei Aqui - UPDATE';
+
+        // print_r($request->all()); // Dados novos
+        // echo '<hr>';
+        // print_r($aluno->getAttributes()); // Dados antigos
+
+        $aluno->update($request->all());
+        return $aluno;
     }
 
     /**
@@ -80,6 +100,9 @@ class AlunoController extends Controller
      */
     public function destroy(Aluno $aluno)
     {
-        //
+        // return 'Cheguei aqui - DESTROY';
+        $aluno->delete();
+
+        return ['msg' => 'O registro foi removido com sucesso'];
     }
 }
