@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 class AlunoController extends Controller
 {
+
+    public $aluno;
+
+    public function __construct(Aluno $aluno) {
+        $this -> aluno = $aluno;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,9 +23,11 @@ class AlunoController extends Controller
     {
         // return 'Cheguei Aqui - INDEX';
 
-        $aluno = Aluno::all();
+        // $aluno = Aluno::all();
 
-        return $aluno;
+        $alunos = $this -> aluno -> all();
+
+        return response()->json($alunos, 200);
     }
 
     /**
@@ -28,7 +37,7 @@ class AlunoController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -42,11 +51,15 @@ class AlunoController extends Controller
         // return ['Cheguei Aqui' => 'STORE']; formato JSON
         // return 'Cheguei Aqui - STORE'; formato HTML
 
-        // dd($request->all());
+        dd($request->all());
 
-        $aluno = Aluno::create($request->all());
+        // $aluno = Aluno::create($request->all());
 
-        return $aluno;
+        $request -> validate($this->aluno->Regras(), $this->aluno->Feedback());
+
+        $alunos = $this->aluno->create($request->all());
+
+        return response()->json($alunos, 200);
     }
 
     /**
