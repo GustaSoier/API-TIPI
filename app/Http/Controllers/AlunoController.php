@@ -35,10 +35,6 @@ class AlunoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -51,7 +47,7 @@ class AlunoController extends Controller
         // return ['Cheguei Aqui' => 'STORE']; formato JSON
         // return 'Cheguei Aqui - STORE'; formato HTML
 
-        dd($request->all());
+        // dd($request->all());
 
         // $aluno = Aluno::create($request->all());
 
@@ -65,14 +61,19 @@ class AlunoController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Aluno  $aluno
+     * @param  Integer
      * @return \Illuminate\Http\Response
      */
-    public function show(Aluno $aluno)
+    public function show($id)
     {
-        // return 'Cheguei Aqui - SHOW';
+        $alunos = $this->aluno->find($id);
 
-        return $aluno;
+        if($alunos === null) {
+            return response()->json(['error' => 'Não existe dados para esse aluno'], 404); // a URL é válida, mas o recurso que uqer acessar não existe no banco
+        }
+
+        // return 'Cheguei Aqui - SHOW';
+        return response()->json($alunos, 200) ;
     }
 
     /**
@@ -93,17 +94,46 @@ class AlunoController extends Controller
      * @param  \App\Models\Aluno  $aluno
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Aluno $aluno)
+    public function update(Request $request, $id)
     {
-        // return 'Cheguei Aqui - UPDATE';
+       //return 'Cheguei aqui - UPDATE';
 
-        // print_r($request->all()); // Dados novos
-        // echo '<hr>';
-        // print_r($aluno->getAttributes()); // Dados antigos
+       /*
+        print_r($request->all()); // Novos dados
+        echo '<hr>';
+        print_r($aluno->getAttributes()); // Dados antigos
+        */
+       $alunos = $this->aluno->find($id);
 
-        $aluno->update($request->all());
-        return $aluno;
+        if($alunos === null){
+            return response()->json(['erro' => 'Impossível realizar a atualização. O aluno não existe!'], 404);
+        }
+
+        if($request->method() === 'PATCH') {
+            // return ['teste' => 'PATCH'];
+
+            $dadosDinamico = [];
+
+            foreach ($alunos->Regras() as $input => $regra) {
+                if(array_key_exists($input, $request->all())) {
+                    $dadosDinamico[$input] = $regra;
+                }
+            }
+
+            // dd($dadosDinamico);
+
+            $request->validate($dadosDinamico, $this->aluno->Feedback());
+        }
+        else{
+            $request->validate($this->aluno->Regras(), $this->aluno->Feedback());
+        }
+
+
+       $alunos -> update($request->all()); // update dos novos dados
+
+       return response()->json($alunos, 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -111,11 +141,18 @@ class AlunoController extends Controller
      * @param  \App\Models\Aluno  $aluno
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Aluno $aluno)
+    public function destroy($id)
     {
-        // return 'Cheguei aqui - DESTROY';
-        $aluno->delete();
 
-        return ['msg' => 'O registro foi removido com sucesso'];
+        $alunos = $this -> aluno -> find($id);
+
+        if($alunos === null){
+            return response()->json(['erro' => 'Impossível deleter este registro. O aluno não existe!'], 404);
+        }
+
+        // return 'Cheguei aqui - DESTROY';
+        $alunos->delete();
+
+        return response()->json(['msg' => 'O registro foi removido com sucesso'], 200);
     }
 }

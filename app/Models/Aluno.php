@@ -13,8 +13,8 @@ class Aluno extends Model
 
     public function Regras() {
         return [
-            'nome' => 'required|unique|min:3',
-            'foto' => 'required|file'
+            'nome' => 'required|unique:alunos,nome,'.$this->id.'|min:3',
+            'foto' => 'required'
             // 'foto' => 'required|file|mimes:png,jpg'
         ];
     }
