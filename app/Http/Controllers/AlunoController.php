@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AlunoController extends Controller
 {
@@ -114,6 +116,9 @@ class AlunoController extends Controller
         */
        $alunos = $this->aluno->find($id);
 
+    //    dd($request->nome);
+    //    dd($request->file('foto'));
+
         if($alunos === null){
             return response()->json(['erro' => 'Impossível realizar a atualização. O aluno não existe!'], 404);
         }
@@ -137,8 +142,18 @@ class AlunoController extends Controller
             $request->validate($this->aluno->Regras(), $this->aluno->Feedback());
         }
 
+        if($request->file('foto') == true) {
+            Storage::disk('public')->delete($alunos->foto);
+        }
 
-       $alunos -> update($request->all()); // update dos novos dados
+        $imagem = $request -> file('foto');
+
+        $imagem_url = $imagem -> store('imagem', 'public');
+
+       $alunos -> update([
+            'nome' => $request->nome,
+            'foto' => $imagem_url
+       ]); // update dos novos dados
 
        return response()->json($alunos, 200);
     }
@@ -158,6 +173,8 @@ class AlunoController extends Controller
         if($alunos === null){
             return response()->json(['erro' => 'Impossível deleter este registro. O aluno não existe!'], 404);
         }
+
+        Storage::disk('public')->delete($alunos->foto);
 
         // return 'Cheguei aqui - DESTROY';
         $alunos->delete();
